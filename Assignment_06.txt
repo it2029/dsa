@@ -1,0 +1,353 @@
+Assignment No.6 
+Title: Represent a graph of your college campus using adjacency list /adjacency matrix. Nodes should 
+represent the various departments/institutes and links should represent the distance between them. Find 
+minimum spanning tree a) Using Kruskal’s algorithm. b) Using Prim’s algorithm. 
+ 
+class Graph: 
+    def __init__(self): 
+        self.V = 0 
+        self.graph = []  # For Kruskal (edge list) 
+        self.adj_matrix = [] 
+        self.dept_names = [] 
+ 
+    def add_department(self, name): 
+        self.dept_names.append(name) 
+        self.V = len(self.dept_names) 
+        for row in self.adj_matrix: 
+            row.append(0) 
+        self.adj_matrix.append([0] * self.V) 
+ 
+    def add_edge(self, u, v, w): 
+        self.graph.append([u, v, w]) 
+        self.adj_matrix[u][v] = w 
+        self.adj_matrix[v][u] = w 
+  def display_adj_matrix(self): 
+        print("\nAdjacency Matrix:") 
+        for row in self.adj_matrix: 
+            print(row) 
+
+--- Page 36 ---
+    def display_adj_list(self): 
+        print("\nAdjacency List:") 
+        for i in range(self.V): 
+            connections = [] 
+            for j in range(self.V): 
+                if self.adj_matrix[i][j] != 0: 
+                    connections.append(f"{self.dept_names[j]}({self.adj_matrix[i][j]})") 
+            print(f"{self.dept_names[i]} -> {', '.join(connections)}") 
+    # ---------------- Kruskal's ---------------- 
+    def find(self, parent, i): 
+        if parent[i] != i: 
+            parent[i] = self.find(parent, parent[i]) 
+        return parent[i] 
+    def union(self, parent, rank, x, y): 
+        if rank[x] < rank[y]: 
+            parent[x] = y 
+        elif rank[x] > rank[y]: 
+            parent[y] = x 
+        else: 
+            parent[y] = x 
+            rank[x] += 1 
+    def kruskal_mst(self): 
+        result = [] 
+        i = 0 
+        e = 0 
+
+--- Page 37 ---
+        edges = sorted(self.graph, key=lambda item: item[2]) 
+        parent = [ ] 
+        rank = [ ] 
+        for node in range(self.V): 
+            parent.append(node) 
+            rank.append(0) 
+        while e < self.V - 1 and i < len(edges): 
+            u, v, w = edges[i] 
+            i += 1 
+            x = self.find(parent, u) 
+            y = self.find(parent, v) 
+            if x != y: 
+                e += 1 
+                result.append([u, v, w]) 
+                self.union(parent, rank, x, y) 
+        print("\nMST using Kruskal's Algorithm:") 
+        total_cost = 0 
+        for u, v, weight in result: 
+            print(f"{self.dept_names[u]} - {self.dept_names[v]}: {weight}") 
+            total_cost += weight 
+        print("Total Distance:", total_cost) 
+   
+ 
+ 
+ 
+
+--- Page 38 ---
+  # ---------------- Prim's ---------------- 
+    def prim_mst(self): 
+        key = [float('inf')] * self.V 
+        parent = [-1] * self.V 
+        key[0] = 0 
+        mst_set = [False] * self.V 
+        for _ in range(self.V): 
+            min_key = float('inf') 
+            min_index = -1 
+            for v in range(self.V): 
+                if not mst_set[v] and key[v] < min_key: 
+                    min_key = key[v] 
+                    min_index = v 
+            u = min_index 
+            mst_set[u] = True 
+            for v in range(self.V): 
+                if self.adj_matrix[u][v] and not mst_set[v] and self.adj_matrix[u][v] < key[v]: 
+                    key[v] = self.adj_matrix[u][v] 
+                    parent[v] = u 
+        print("\nMST using Prim's Algorithm:") 
+        total_cost = 0 
+        for i in range(1, self.V): 
+            print(f"{self.dept_names[parent[i]]} - {self.dept_names[i]}: {self.adj_matrix[i][parent[i]]}") 
+            total_cost += self.adj_matrix[i][parent[i]] 
+        print("Total Distance:", total_cost) 
+
+--- Page 39 ---
+def main(): 
+    g = Graph() 
+    while True: 
+        print("\n--- College Campus Graph Menu ---") 
+        print("1. Add Department") 
+        print("2. Add Distance Between Departments") 
+        print("3. Display Adjacency Matrix") 
+        print("4. Display Adjacency List") 
+        print("5. Find MST (Kruskal's Algorithm)") 
+        print("6. Find MST (Prim's Algorithm)") 
+        print("7. Exit") 
+        choice = input("Enter your choice: ") 
+ 
+        if choice == '1': 
+            name = input("Enter Department Name: ") 
+            g.add_department(name) 
+        elif choice == '2': 
+            if g.V < 2: 
+                print("Add at least two departments first!") 
+                continue 
+            print("\nDepartments:") 
+            for idx, dept in enumerate(g.dept_names): 
+                print(f"{idx}: {dept}") 
+            u = int(input("Enter index of Department 1: ")) 
+            v = int(input("Enter index of Department 2: ")) 
+
+--- Page 40 ---
+            w = int(input("Enter Distance: ")) 
+            g.add_edge(u, v, w) 
+ 
+        elif choice == '3': 
+            g.display_adj_matrix() 
+ 
+        elif choice == '4': 
+            g.display_adj_list() 
+ 
+        elif choice == '5': 
+            g.kruskal_mst() 
+ 
+        elif choice == '6': 
+            g.prim_mst() 
+ 
+        elif choice == '7': 
+            print("Exiting...") 
+            break 
+        else: 
+            print("Invalid choice, try again.") 
+ 
+if __name__ == "__main__": 
+    main() 
+ 
+ 
+
+--- Page 41 ---
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 1 
+Enter Department Name: IT 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 1 
+Enter Department Name: mech 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+
+--- Page 42 ---
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 1 
+Enter Department Name: civil 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 1 
+Enter Department Name: etc 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 2 
+ 
+
+--- Page 43 ---
+Departments: 
+0: IT 
+1: mech 
+2: civil 
+3: etc 
+Enter index of Department 1: 0 
+Enter index of Department 2: 1 
+Enter Distance: 5 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 2 
+Departments: 
+0: IT 
+1: mech 
+2: civil 
+3: etc 
+Enter index of Department 1: 1 
+Enter index of Department 2: 2 
+Enter Distance: 7 
+
+--- Page 44 ---
+ 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 2 
+Departments: 
+0: IT 
+1: mech 
+2: civil 
+3: etc 
+Enter index of Department 1: 2 
+Enter index of Department 2: 3 
+Enter Distance: 9 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+
+--- Page 45 ---
+7. Exit 
+Enter your choice: 3 
+Adjacency Matrix: 
+[0, 5, 0, 0] 
+[5, 0, 7, 0] 
+[0, 7, 0, 9] 
+[0, 0, 9, 0] 
+ 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 4 
+Adjacency List: 
+IT -> mech(5) 
+mech -> IT(5), civil(7) 
+civil -> mech(7), etc(9) 
+etc -> civil(9) 
+ 
+--- College Campus Graph Menu --- 
+1. Add Department 
+
+--- Page 46 ---
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 5 
+MST using Kruskal's Algorithm: 
+IT - mech: 5 
+mech - civil: 7 
+civil - etc: 9 
+Total Distance: 21 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 6 
+MST using Prim's Algorithm: 
+IT - mech: 5 
+mech - civil: 7 
+civil - etc: 9 
+
+--- Page 47 ---
+Total Distance: 21 
+--- College Campus Graph Menu --- 
+1. Add Department 
+2. Add Distance Between Departments 
+3. Display Adjacency Matrix 
+4. Display Adjacency List 
+5. Find MST (Kruskal's Algorithm) 
+6. Find MST (Prim's Algorithm) 
+7. Exit 
+Enter your choice: 7 
+Exiting... 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+--- Page 48 ---
